@@ -2,9 +2,12 @@ const express = require('express')
 const morgan = require('morgan')
 const app = express()
 
-app.use(morgan('tiny'))
 app.use(express.json())
 
+morgan.token('post-content', function (req, res) {
+    if (JSON.stringify(req.body) !== "{}") return JSON.stringify(req.body)
+})
+app.use(morgan(':method :url :status :res[content-length] - :response-time ms :post-content'))
 
 let persons = [
     {
@@ -32,7 +35,6 @@ let persons = [
 const generateId = () => {
     return Math.floor(Math.random() * Math.floor(1000000));
 }
-
 
 app.get('/', (req, res) => {
     res.send('<h1>Puhelinluettelo!</h1>')
