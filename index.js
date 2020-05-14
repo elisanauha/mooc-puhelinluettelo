@@ -68,8 +68,21 @@ app.post('/api/persons', (req, res) => {
     const body = req.body
 
     if (!body.name) {
-        return response.status(400).json({
+        return res.status(400).json({
             error: 'name missing'
+        })
+    }
+
+    if (!body.number) {
+        return res.status(400).json({
+            error: 'number missing'
+        })
+    }
+
+    const personExists = persons.find(person => person.name === body.name)
+    if (personExists) {
+        return res.status(400).json({
+            error: 'name must be unique'
         })
     }
 
