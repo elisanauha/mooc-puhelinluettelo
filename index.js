@@ -61,6 +61,7 @@ app.put("/api/persons/:id", (req, res, next) => {
     name: body.name,
     number: body.number,
   };
+  // Because we make the person as object the validation doesn't work.
   Person.findByIdAndUpdate(req.params.id, person, { new: true })
     .then((updatedPerson) => {
       res.json(updatedPerson);
