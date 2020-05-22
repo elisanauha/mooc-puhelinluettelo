@@ -94,22 +94,21 @@ app.post("/api/persons", (req, res) => {
     });
   }
 
-  const personExists = persons.find((person) => person.name === body.name);
-  if (personExists) {
-    return res.status(400).json({
-      error: "name must be unique",
-    });
-  }
+  // const personExists = persons.find((person) => person.name === body.name);
+  // if (personExists) {
+  //   return res.status(400).json({
+  //     error: "name must be unique",
+  //   });
+  // }
 
-  const person = {
+  const person = new Person({
     name: body.name,
     number: body.number,
-    id: generateId(),
-  };
+  });
 
-  persons = persons.concat(person);
-
-  res.json(person);
+  person.save().then((savedPerson) => {
+    res.json(savedPerson);
+  });
 });
 
 const PORT = process.env.PORT;
