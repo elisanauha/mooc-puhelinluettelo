@@ -57,12 +57,6 @@ app.delete("/api/persons/:id", (req, res, next) => {
 app.put("/api/persons/:id", (req, res, next) => {
   const body = req.body;
 
-  if (!body.number) {
-    return res.status(400).json({
-      error: "number missing",
-    });
-  }
-
   const person = {
     name: body.name,
     number: body.number,
@@ -74,54 +68,41 @@ app.put("/api/persons/:id", (req, res, next) => {
     .catch((error) => next(error));
 });
 
-const errorHandler = (error, request, response, next) => {
-  console.log(error.message);
-  if (error.name === "CastError") {
-    return response.status(400).send({ error: "malformed id" });
-  }
-  next(error);
-};
-
-app.use(errorHandler);
-
 app.get("/api/persons", (req, res) => {
   Person.find({}).then((foundPeople) => {
     res.json(foundPeople);
   });
 });
 
-app.post("/api/persons", (req, res) => {
+app.post("/api/persons", (req, res, next) => {
   console.log(req.body);
   const body = req.body;
-
-  if (!body.name) {
-    return res.status(400).json({
-      error: "name missing",
-    });
-  }
-
-  if (!body.number) {
-    return res.status(400).json({
-      error: "number missing",
-    });
-  }
-
-  // const personExists = persons.find((person) => person.name === body.name);
-  // if (personExists) {
-  //   return res.status(400).json({
-  //     error: "name must be unique",
-  //   });
-  // }
 
   const person = new Person({
     name: body.name,
     number: body.number,
   });
 
-  person.save().then((savedPerson) => {
-    res.json(savedPerson);
-  });
+  person
+    .save()
+    .then((savedPerson) => {
+      res.json(savedPerson);
+    })
+    .catch((error) => next(error));
 });
+
+const errorHandler = (error, request, response, next) => {
+  console.log(error.message);
+  if (error.name === "CastError") {
+    return response.status(400).send({ error: "malformed id" });
+  }
+  if (error.name === "ValidationError") {
+    return response.status(400).json({ error: error.message });
+  }
+  next(error);
+};
+
+app.use(errorHandler);
 
 const PORT = process.env.PORT;
 app.listen(PORT, () => {
