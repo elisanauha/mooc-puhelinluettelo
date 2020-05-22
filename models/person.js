@@ -2,6 +2,7 @@ const mongoose = require('mongoose')
 const uniqueValidator = require('mongoose-unique-validator')
 mongoose.set('useFindAndModify', false)
 mongoose.set('useCreateIndex', true)
+// eslint-disable-next-line no-undef
 const url = process.env.MONGODB_URI
 
 console.log('connecting to', url)
